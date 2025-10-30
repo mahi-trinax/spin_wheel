@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Spin the Wheel — Picker</title>
+    <style>
+      :root {
+        --card: rgba(255, 255, 255, 0.12);
+        --card-border: rgba(255, 255, 255, 0.22);
+        --text: #eaeaea;
+        --muted: #a9b1bd;
+        --accent: #7c5cff;
+        --accent-2: #39d0ff;
+        --good: #35d07f;
+        --danger: #ff5d5d;
+        --shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        background: radial-gradient(
+          1200px 600px at 10% 10%,
+          #1a1a2e 0%,
+          #0d0f1a 60%,
+          #0a0a12 100%
+        );
+        color: var(--text);
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto,
+          "Helvetica Neue", Arial;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+      .wrap {
+        min-height: 100%;
+        display: grid;
+        place-items: center;
+        padding: 28px;
+      }
+      .card {
+        width: min(1100px, 94vw);
+        background: var(--card);
+        border: 1px solid var(--card-border);
+        border-radius: 20px;
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(12px);
+        padding: 22px;
+      }
+      .card h1 {
+        margin: 0 0 14px 0;
+        font-size: clamp(22px, 2.8vw, 34px);
+        letter-spacing: 0.5px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .hint {
+        color: var(--muted);
+        font-size: 13px;
+      }
+      .grid {
+        display: grid;
+        gap: 22px;
+        grid-template-columns: 420px 1fr;
+      }
+      @media (max-width: 980px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .panel {
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid var(--card-border);
+        border-radius: 16px;
+        padding: 16px;
+      }
+      .row {
+        display: flex;
+        gap: 10px;
+      }
+      input[type="text"] {
+        flex: 1;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 12px;
+        color: var(--text);
+        padding: 12px 14px;
+        outline: none;
+        font-size: 14px;
+      }
+      input[type="text"]::placeholder {
+        color: #9aa3ad;
+      }
+      button {
+        border: 0;
+        border-radius: 12px;
+        padding: 12px 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.04s ease, box-shadow 0.2s ease,
+          opacity 0.2s ease;
+      }
+      button:active {
+        transform: translateY(1px);
+      }
+      .btn-add {
+        background: linear-gradient(135deg, var(--accent), var(--accent-2));
+        color: white;
+        box-shadow: 0 8px 18px rgba(124, 92, 255, 0.35);
+      }
+      .btn-spin {
+        width: 100%;
+        margin-top: 10px;
+        background: linear-gradient(135deg, #ff9d45, #ff5d9d);
+        color: white;
+        box-shadow: 0 10px 22px rgba(255, 93, 157, 0.35);
+        padding: 14px 16px;
+        font-size: 16px;
+        letter-spacing: 0.2px;
+      }
+      .btn-clear {
+        background: rgba(255, 255, 255, 0.08);
+        color: #e6e6e6;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+      }
+      .chips {
+        margin-top: 12px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        max-height: 200px;
+        overflow: auto;
+        padding-right: 4px;
+      }
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        color: #e9edf3;
+        padding: 8px 10px;
+        border-radius: 999px;
+        font-size: 13px;
+        white-space: nowrap;
+      }
+      .chip .x {
+        width: 18px;
+        height: 18px;
+        display: grid;
+        place-items: center;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.12);
+        cursor: pointer;
+        user-select: none;
+      }
+
+      .stage {
+        position: relative;
+        display: grid;
+        place-items: center;
+        padding: 8px;
+        background: radial-gradient(
+          600px 300px at 30% 30%,
+          rgba(255, 255, 255, 0.06),
+          transparent 60%
+        );
+        border: 1px solid var(--card-border);
+        border-radius: 16px;
+      }
+      .wheel-wrap {
+        position: relative;
+        width: min(560px, 80vw);
+        aspect-ratio: 1/1;
+      }
+      canvas {
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+      .pointer {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        translate: -50% -50%;
+        width: 0;
+        height: 0;
+        border-left: 14px solid transparent;
+        border-right: 14px solid transparent;
+        border-bottom: 26px solid #fff;
+        filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.35));
+        transform: translateY(calc(-50% - 230px));
+      }
+      .center-cap {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        translate: -50% -50%;
+        width: 78px;
+        height: 78px;
+        border-radius: 50%;
+        background: radial-gradient(circle at 30% 30%, #ffffff, #e0e0e0);
+        box-shadow: inset 0 0 0 6px rgba(0, 0, 0, 0.12),
+          0 10px 24px rgba(0, 0, 0, 0.35);
+      }
+
+      .modal {
+        position: fixed;
+        inset: 0;
+        display: none;
+        place-items: center;
+        z-index: 50;
+        background: rgba(0, 0, 0, 0.45);
+        animation: fadeIn 0.25s ease forwards;
+      }
+      .modal.open {
+        display: grid;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+      .modal-card {
+        width: min(520px, 92vw);
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.12),
+          rgba(255, 255, 255, 0.06)
+        );
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        border-radius: 18px;
+        padding: 22px;
+        text-align: center;
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(10px);
+        animation: pop 0.28s cubic-bezier(0.2, 0.9, 0.25, 1.3) both;
+      }
+      @keyframes pop {
+        from {
+          transform: scale(0.8);
+          opacity: 0;
+        }
+        to {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+      .modal h2 {
+        margin: 6px 0 2px 0;
+        font-size: clamp(22px, 2.5vw, 30px);
+      }
+      .winner {
+        font-weight: 800;
+        font-size: clamp(26px, 3.2vw, 38px);
+        background: linear-gradient(90deg, #ffd76d, #fff, #ffd76d);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        text-shadow: 0 2px 10px rgba(255, 215, 109, 0.25);
+      }
+      .modal .btns {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        margin-top: 14px;
+      }
+      .btn-ok {
+        background: linear-gradient(135deg, var(--good), #23b56b);
+        color: white;
+      }
+      .tiny {
+        font-size: 12px;
+        color: #cbd3df;
+        margin-top: 6px;
+      }
+      .confetti {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        overflow: hidden;
+      }
+      .confetti i {
+        position: absolute;
+        width: 8px;
+        height: 14px;
+        top: -20px;
+        background: white;
+        opacity: 0.9;
+        animation: drop linear forwards;
+        transform: rotate(15deg);
+      }
+      @keyframes drop {
+        to {
+          transform: translateY(120vh) rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="card">
+        <h1>🎡 Spin the Wheel</h1>
+
+        <div class="grid">
+          <!-- LEFT: input/controls -->
+          <div class="panel">
+            <div class="row">
+              <input
+                id="nameInput"
+                type="text"
+                placeholder="Type a name and press Enter…"
+              />
+              <button class="btn-add" id="btnAdd">Add</button>
+            </div>
+            <div class="row" style="margin-top: 10px">
+              <button class="btn-clear" id="btnSample">Add sample names</button>
+              <button class="btn-clear" id="btnClear">Clear all</button>
+            </div>
+            <div class="chips" id="chips"></div>
+
+            <button class="btn-spin" id="btnSpin">SPIN 🎉</button>
+          </div>
+
+          <!-- RIGHT: wheel -->
+          <div class="stage">
+            <div class="wheel-wrap">
+              <canvas id="wheel" width="1100" height="1100"></canvas>
+              <div class="pointer" aria-hidden="true"></div>
+              <div class="center-cap" aria-hidden="true"></div>
+            </div>
+            <p class="hint" style="margin-top: 10px">
+              Tip: add at least 2 names, then spin!
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal" id="modal">
+      <div class="confetti" id="confetti"></div>
+      <div class="modal-card">
+        <div style="font-size: 46px">🎊</div>
+        <h2>Congrats!</h2>
+        <div class="winner" id="winnerName">Someone</div>
+        <div class="tiny">This winner has been removed from the wheel.</div>
+        <div class="btns">
+          <button class="btn-ok" id="btnClose">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      (function () {
+        // silently exclude specific names from winning
+        const EXCLUDED_INTERNAL = new Set(["m", "mahi", "mahidhar"]);
+
+        let entrants = []; // { name: string, excluded: boolean }
+        let spinning = false;
+        let currentRotation = 0; // degrees
+        let pendingWinnerIndex = null;
+
+        const elInput = document.getElementById("nameInput");
+        const elAdd = document.getElementById("btnAdd");
+        const elSample = document.getElementById("btnSample");
+        const elClear = document.getElementById("btnClear");
+        const elChips = document.getElementById("chips");
+        const elSpin = document.getElementById("btnSpin");
+        const elCanvas = document.getElementById("wheel");
+        const ctx = elCanvas.getContext("2d");
+        const elModal = document.getElementById("modal");
+        const elWinner = document.getElementById("winnerName");
+        const elClose = document.getElementById("btnClose");
+        const elConfetti = document.getElementById("confetti");
+
+        function setupCanvas() {
+          const dpr = window.devicePixelRatio || 1;
+          const sizeCSS = elCanvas.clientWidth;
+          const size = Math.floor(sizeCSS * dpr);
+          elCanvas.width = size;
+          elCanvas.height = size;
+          ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+          drawWheel();
+        }
+        new ResizeObserver(setupCanvas).observe(elCanvas);
+
+        const isExcluded = (n) =>
+          EXCLUDED_INTERNAL.has(
+            String(n || "")
+              .trim()
+              .toLowerCase()
+          );
+        const hsl = (i, n) =>
+          `hsl(${Math.round((i * (360 / Math.max(1, n))) % 360)} 85% 65%)`;
+        const center = () => ({
+          x: elCanvas.width / (window.devicePixelRatio || 1) / 2,
+          y: elCanvas.height / (window.devicePixelRatio || 1) / 2,
+        });
+
+        function drawWheel() {
+          const N = entrants.length || 1;
+          const { x: cx, y: cy } = center();
+          const R = Math.min(cx, cy) - 6;
+          ctx.clearRect(0, 0, elCanvas.width, elCanvas.height);
+          ctx.save();
+          ctx.translate(cx, cy);
+          ctx.rotate((-90 * Math.PI) / 180);
+
+          const slice = (Math.PI * 2) / N;
+
+          for (let i = 0; i < N; i++) {
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.arc(0, 0, R, i * slice, (i + 1) * slice);
+            ctx.closePath();
+            ctx.fillStyle = hsl(i, N);
+            ctx.fill();
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = "rgba(0,0,0,.25)";
+            ctx.stroke();
+
+            const name = entrants[i]?.name ?? "";
+            const mid = i * slice + slice / 2;
+            ctx.save();
+            ctx.rotate(mid);
+            ctx.textAlign = "right";
+            ctx.fillStyle = "#0a0a0a";
+            ctx.font = `600 ${Math.max(
+              12,
+              Math.min(20, R * 0.08)
+            )}px ui-sans-serif, system-ui, -apple-system`;
+            const maxW = R * 0.78;
+            const truncated = truncate(name, ctx, maxW);
+            ctx.fillText(truncated, R - 14, 6); // (no lock emoji, no badge)
+            ctx.restore();
+          }
+
+          ctx.beginPath();
+          ctx.arc(0, 0, R, 0, Math.PI * 2);
+          ctx.lineWidth = 8;
+          ctx.strokeStyle = "rgba(255,255,255,.35)";
+          ctx.stroke();
+          ctx.restore();
+
+          elCanvas.style.transform = `rotate(${currentRotation}deg)`;
+        }
+
+        function truncate(text, context, maxWidth) {
+          if (context.measureText(text).width <= maxWidth) return text;
+          let t = text;
+          while (t.length && context.measureText(t + "…").width > maxWidth)
+            t = t.slice(0, -1);
+          return t + "…";
+        }
+
+        function renderChips() {
+          elChips.innerHTML = "";
+          entrants.forEach((e, idx) => {
+            const chip = document.createElement("div");
+            chip.className = "chip";
+            chip.innerHTML = `
+        <span>${escapeHtml(e.name)}</span>
+        <span class="x" title="Remove" data-i="${idx}">✕</span>
+      `;
+            elChips.appendChild(chip);
+          });
+          elChips.querySelectorAll(".x").forEach((x) => {
+            x.addEventListener("click", (ev) => {
+              const i = Number(ev.currentTarget.getAttribute("data-i"));
+              entrants.splice(i, 1);
+              drawWheel();
+              renderChips();
+            });
+          });
+        }
+
+        function addName(raw) {
+          const name = String(raw || "").trim();
+          if (!name) return;
+          entrants.push({ name, excluded: isExcluded(name) });
+          renderChips();
+          drawWheel();
+        }
+        function clearAll() {
+          entrants = [];
+          currentRotation = 0;
+          pendingWinnerIndex = null;
+          renderChips();
+          drawWheel();
+        }
+
+        function pickWinnerIndex() {
+          const selectable = entrants
+            .map((e, i) => ({ ...e, i }))
+            .filter((e) => !e.excluded);
+          if (selectable.length === 0) return null;
+          const pick =
+            selectable[Math.floor(Math.random() * selectable.length)];
+          return pick.i;
+        }
+
+        function computeTargetRotationForIndex(index) {
+          const N = Math.max(entrants.length, 1);
+          const sliceDeg = 360 / N;
+          const sliceCenter = (index + 0.5) * sliceDeg;
+          const pointerDeg = 270; // top
+          const neededAtEnd = (((pointerDeg - sliceCenter) % 360) + 360) % 360;
+          const currentMod = ((currentRotation % 360) + 360) % 360;
+          const delta = (((neededAtEnd - currentMod) % 360) + 360) % 360;
+          const spins = 4 + Math.floor(Math.random() * 3);
+          return currentRotation + spins * 360 + delta;
+        }
+
+        const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
+
+        function spin() {
+          if (spinning) return;
+          if (entrants.length < 2) {
+            alert("Add at least 2 names to spin.");
+            return;
+          }
+          const idx = pickWinnerIndex();
+          if (idx === null) {
+            alert("No selectable names available. Add more names to spin.");
+            return;
+          }
+          pendingWinnerIndex = idx;
+          const target = computeTargetRotationForIndex(idx);
+
+          const start = performance.now();
+          const duration = 3600 + Math.random() * 600;
+          const from = currentRotation;
+          const to = target;
+          spinning = true;
+          elSpin.disabled = true;
+
+          const step = (now) => {
+            const t = Math.min(1, (now - start) / duration);
+            const eased = easeOutCubic(t);
+            currentRotation = from + (to - from) * eased;
+            drawWheel();
+            if (t < 1) {
+              requestAnimationFrame(step);
+            } else {
+              spinning = false;
+              elSpin.disabled = false;
+              showWinnerModal(entrants[pendingWinnerIndex].name);
+            }
+          };
+          requestAnimationFrame(step);
+        }
+
+        function showWinnerModal(name) {
+          elWinner.textContent = name;
+          elModal.classList.add("open");
+          blastConfetti();
+        }
+        function closeModalAndRemoveWinner() {
+          if (pendingWinnerIndex != null) {
+            entrants.splice(pendingWinnerIndex, 1);
+            pendingWinnerIndex = null;
+            renderChips();
+            drawWheel();
+          }
+          elModal.classList.remove("open");
+          clearConfetti();
+        }
+
+        function blastConfetti() {
+          clearConfetti();
+          const colors = [
+            "#FFD166",
+            "#EF476F",
+            "#06D6A0",
+            "#118AB2",
+            "#ffffff",
+          ];
+          const n = 120;
+          const durMin = 900,
+            durVar = 1000;
+          for (let i = 0; i < n; i++) {
+            const p = document.createElement("i");
+            p.style.left = Math.random() * 100 + "%";
+            p.style.background = colors[i % colors.length];
+            const delay = Math.random() * 200;
+            const rot = Math.random() * 40 - 20;
+            p.style.transform = `rotate(${rot}deg)`;
+            p.style.animationDuration = durMin + Math.random() * durVar + "ms";
+            p.style.animationDelay = delay + "ms";
+            elConfetti.appendChild(p);
+          }
+        }
+        function clearConfetti() {
+          elConfetti.innerHTML = "";
+        }
+
+        elAdd.addEventListener("click", () => {
+          addName(elInput.value);
+          elInput.value = "";
+          elInput.focus();
+        });
+        elInput.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") {
+            addName(elInput.value);
+            elInput.value = "";
+          }
+        });
+        elSample.addEventListener("click", () => {
+          [
+            "Alice",
+            "Bob",
+            "Carla",
+            "Dinesh",
+            "Mahi",
+            "Eunice",
+            "Felix",
+            "Grace",
+          ].forEach(addName);
+        });
+        elClear.addEventListener("click", clearAll);
+        elSpin.addEventListener("click", spin);
+        elClose.addEventListener("click", closeModalAndRemoveWinner);
+        elModal.addEventListener("click", (e) => {
+          if (e.target === elModal) closeModalAndRemoveWinner();
+        });
+
+        function escapeHtml(s) {
+          return s.replace(
+            /[&<>"']/g,
+            (c) =>
+              ({
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#039;",
+              }[c])
+          );
+        }
+
+        setupCanvas();
+      })();
+    </script>
+  </body>
+</html>
