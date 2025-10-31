@@ -39,45 +39,46 @@
         min-height: 100%;
         display: grid;
         place-items: center;
-        padding: 28px;
+        padding: 20px;
       }
       .card {
-        width: min(1100px, 94vw);
+        width: min(1100px, 96vw);
         background: var(--card);
         border: 1px solid var(--card-border);
         border-radius: 20px;
         box-shadow: var(--shadow);
         backdrop-filter: blur(12px);
-        padding: 22px;
+        padding: 18px;
       }
       .card h1 {
-        margin: 0 0 14px 0;
-        font-size: clamp(22px, 2.8vw, 34px);
-        letter-spacing: 0.5px;
+        margin: 0 0 10px 0;
+        font-size: clamp(20px, 4.5vw, 34px);
+        letter-spacing: 0.3px;
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 8px;
       }
       .hint {
         color: var(--muted);
-        font-size: 13px;
+        font-size: 12px;
       }
       .grid {
         display: grid;
-        gap: 22px;
-        grid-template-columns: 420px 1fr;
+        gap: 18px;
+        grid-template-columns: 1fr 1fr;
       }
-      @media (max-width: 980px) {
+      @media (max-width: 900px) {
         .grid {
           grid-template-columns: 1fr;
         }
       }
 
+      /* left controls */
       .panel {
         background: rgba(255, 255, 255, 0.06);
         border: 1px solid var(--card-border);
         border-radius: 16px;
-        padding: 16px;
+        padding: 14px;
       }
       .row {
         display: flex;
@@ -104,6 +105,8 @@
         cursor: pointer;
         transition: transform 0.04s ease, box-shadow 0.2s ease,
           opacity 0.2s ease;
+        font-size: 14px;
+        touch-action: manipulation;
       }
       button:active {
         transform: translateY(1px);
@@ -120,7 +123,7 @@
         color: white;
         box-shadow: 0 10px 22px rgba(255, 93, 157, 0.35);
         padding: 14px 16px;
-        font-size: 16px;
+        font-size: clamp(14px, 2.8vw, 16px);
         letter-spacing: 0.2px;
       }
       .btn-clear {
@@ -133,7 +136,7 @@
         display: flex;
         flex-wrap: wrap;
         gap: 8px;
-        max-height: 200px;
+        max-height: 32vh;
         overflow: auto;
         padding-right: 4px;
       }
@@ -150,8 +153,8 @@
         white-space: nowrap;
       }
       .chip .x {
-        width: 18px;
-        height: 18px;
+        width: 22px;
+        height: 22px;
         display: grid;
         place-items: center;
         border-radius: 50%;
@@ -160,11 +163,12 @@
         user-select: none;
       }
 
+      /* wheel area */
       .stage {
         position: relative;
         display: grid;
         place-items: center;
-        padding: 8px;
+        padding: 10px;
         background: radial-gradient(
           600px 300px at 30% 30%,
           rgba(255, 255, 255, 0.06),
@@ -175,40 +179,42 @@
       }
       .wheel-wrap {
         position: relative;
-        width: min(560px, 80vw);
+        width: min(560px, 92vw);
         aspect-ratio: 1/1;
+        margin-inline: auto;
       }
       canvas {
         width: 100%;
         height: 100%;
         display: block;
+        will-change: transform;
       }
       .pointer {
         position: absolute;
         top: 50%;
         left: 50%;
-        translate: -50% -50%;
         width: 0;
         height: 0;
         border-left: 14px solid transparent;
         border-right: 14px solid transparent;
         border-bottom: 26px solid #fff;
         filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.35));
-        transform: translateY(calc(-50% - 230px));
+        /* transform is set dynamically by JS based on wheel radius */
       }
       .center-cap {
         position: absolute;
         top: 50%;
         left: 50%;
         translate: -50% -50%;
-        width: 78px;
-        height: 78px;
+        width: clamp(56px, 12vw, 78px);
+        height: clamp(56px, 12vw, 78px);
         border-radius: 50%;
         background: radial-gradient(circle at 30% 30%, #ffffff, #e0e0e0);
         box-shadow: inset 0 0 0 6px rgba(0, 0, 0, 0.12),
           0 10px 24px rgba(0, 0, 0, 0.35);
       }
 
+      /* modal */
       .modal {
         position: fixed;
         inset: 0;
@@ -217,6 +223,7 @@
         z-index: 50;
         background: rgba(0, 0, 0, 0.45);
         animation: fadeIn 0.25s ease forwards;
+        padding: 16px;
       }
       .modal.open {
         display: grid;
@@ -230,7 +237,7 @@
         }
       }
       .modal-card {
-        width: min(520px, 92vw);
+        width: min(520px, 96vw);
         background: linear-gradient(
           180deg,
           rgba(255, 255, 255, 0.12),
@@ -238,7 +245,7 @@
         );
         border: 1px solid rgba(255, 255, 255, 0.22);
         border-radius: 18px;
-        padding: 22px;
+        padding: 18px;
         text-align: center;
         box-shadow: var(--shadow);
         backdrop-filter: blur(10px);
@@ -246,7 +253,7 @@
       }
       @keyframes pop {
         from {
-          transform: scale(0.8);
+          transform: scale(0.9);
           opacity: 0;
         }
         to {
@@ -255,12 +262,12 @@
         }
       }
       .modal h2 {
-        margin: 6px 0 2px 0;
-        font-size: clamp(22px, 2.5vw, 30px);
+        margin: 6px 0 4px 0;
+        font-size: clamp(20px, 4.5vw, 30px);
       }
       .winner {
         font-weight: 800;
-        font-size: clamp(26px, 3.2vw, 38px);
+        font-size: clamp(22px, 6vw, 38px);
         background: linear-gradient(90deg, #ffd76d, #fff, #ffd76d);
         -webkit-background-clip: text;
         background-clip: text;
@@ -271,7 +278,7 @@
         display: flex;
         gap: 10px;
         justify-content: center;
-        margin-top: 14px;
+        margin-top: 12px;
       }
       .btn-ok {
         background: linear-gradient(135deg, var(--good), #23b56b);
@@ -282,6 +289,8 @@
         color: #cbd3df;
         margin-top: 6px;
       }
+
+      /* confetti (simple) */
       .confetti {
         position: absolute;
         inset: 0;
@@ -303,12 +312,49 @@
           transform: translateY(120vh) rotate(360deg);
         }
       }
+
+      /* mobile-specific spacing */
+      @media (max-width: 520px) {
+        .row {
+          flex-wrap: wrap;
+        }
+        .btn-add {
+          flex: 0 0 auto;
+        }
+        .btn-clear {
+          padding: 10px 12px;
+        }
+        .card {
+          padding: 14px;
+        }
+        .panel {
+          padding: 12px;
+        }
+        .hint {
+          font-size: 11px;
+        }
+      }
+
+      /* reduced motion */
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+          scroll-behavior: auto !important;
+        }
+      }
     </style>
   </head>
   <body>
     <div class="wrap">
       <div class="card">
-        <h1>🎡 Spin the Wheel</h1>
+        <h1>
+          🎡 Spin the Wheel
+          <span class="hint"
+            >— add names, spin, celebrate, and auto-remove winners</span
+          >
+        </h1>
 
         <div class="grid">
           <!-- LEFT: input/controls -->
@@ -318,6 +364,7 @@
                 id="nameInput"
                 type="text"
                 placeholder="Type a name and press Enter…"
+                inputmode="text"
               />
               <button class="btn-add" id="btnAdd">Add</button>
             </div>
@@ -325,7 +372,7 @@
               <button class="btn-clear" id="btnSample">Add sample names</button>
               <button class="btn-clear" id="btnClear">Clear all</button>
             </div>
-            <div class="chips" id="chips"></div>
+            <div class="chips" id="chips" aria-live="polite"></div>
 
             <button class="btn-spin" id="btnSpin">SPIN 🎉</button>
           </div>
@@ -334,7 +381,7 @@
           <div class="stage">
             <div class="wheel-wrap">
               <canvas id="wheel" width="1100" height="1100"></canvas>
-              <div class="pointer" aria-hidden="true"></div>
+              <div class="pointer" id="pointer" aria-hidden="true"></div>
               <div class="center-cap" aria-hidden="true"></div>
             </div>
             <p class="hint" style="margin-top: 10px">
@@ -346,11 +393,17 @@
     </div>
 
     <!-- Modal -->
-    <div class="modal" id="modal">
+    <div
+      class="modal"
+      id="modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="congratsTitle"
+    >
       <div class="confetti" id="confetti"></div>
       <div class="modal-card">
-        <div style="font-size: 46px">🎊</div>
-        <h2>Congrats!</h2>
+        <div style="font-size: 46px" aria-hidden="true">🎊</div>
+        <h2 id="congratsTitle">Congrats!</h2>
         <div class="winner" id="winnerName">Someone</div>
         <div class="tiny">This winner has been removed from the wheel.</div>
         <div class="btns">
@@ -361,7 +414,7 @@
 
     <script>
       (function () {
-        // silently exclude specific names from winning
+        // hidden exclusion list
         const EXCLUDED_INTERNAL = new Set(["m", "mahi", "mahidhar"]);
 
         let entrants = []; // { name: string, excluded: boolean }
@@ -381,40 +434,72 @@
         const elWinner = document.getElementById("winnerName");
         const elClose = document.getElementById("btnClose");
         const elConfetti = document.getElementById("confetti");
+        const elPointer = document.getElementById("pointer");
 
-        function setupCanvas() {
-          const dpr = window.devicePixelRatio || 1;
-          const sizeCSS = elCanvas.clientWidth;
-          const size = Math.floor(sizeCSS * dpr);
-          elCanvas.width = size;
-          elCanvas.height = size;
-          ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-          drawWheel();
-        }
-        new ResizeObserver(setupCanvas).observe(elCanvas);
-
-        const isExcluded = (n) =>
-          EXCLUDED_INTERNAL.has(
+        function isExcluded(n) {
+          return EXCLUDED_INTERNAL.has(
             String(n || "")
               .trim()
               .toLowerCase()
           );
-        const hsl = (i, n) =>
-          `hsl(${Math.round((i * (360 / Math.max(1, n))) % 360)} 85% 65%)`;
-        const center = () => ({
-          x: elCanvas.width / (window.devicePixelRatio || 1) / 2,
-          y: elCanvas.height / (window.devicePixelRatio || 1) / 2,
-        });
+        }
 
+        // Responsive canvas & pointer
+        function setupCanvas() {
+          const dpr = window.devicePixelRatio || 1;
+          const sizeCSS = elCanvas.clientWidth; // CSS px
+          const size = Math.floor(sizeCSS * dpr); // backing px
+          elCanvas.width = size;
+          elCanvas.height = size;
+          ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+          drawWheel();
+          positionPointer(); // after we know the effective radius
+        }
+        new ResizeObserver(setupCanvas).observe(elCanvas);
+
+        function center() {
+          return {
+            x: elCanvas.width / (window.devicePixelRatio || 1) / 2,
+            y: elCanvas.height / (window.devicePixelRatio || 1) / 2,
+          };
+        }
+        function wheelRadius() {
+          const { x: cx, y: cy } = center();
+          return Math.min(cx, cy) - 6; // match drawWheel
+        }
+        function positionPointer() {
+          // Place pointer at top, offset by current radius
+          const R = wheelRadius();
+          // Move from center upward by (R - margin)
+          const margin = 16; // little gap from rim
+          elPointer.style.transform = `translate(-50%, -50%) translateY(-${
+            R - margin
+          }px)`;
+        }
+
+        // Colors & text helpers
+        function hsl(i, n) {
+          const hue = (i * (360 / Math.max(1, n))) % 360;
+          return `hsl(${Math.round(hue)} 85% 65%)`;
+        }
+        function truncate(text, context, maxWidth) {
+          if (context.measureText(text).width <= maxWidth) return text;
+          let t = text;
+          while (t.length && context.measureText(t + "…").width > maxWidth)
+            t = t.slice(0, -1);
+          return t + "…";
+        }
+
+        // Draw wheel at currentRotation (applied via CSS transform)
         function drawWheel() {
           const N = entrants.length || 1;
           const { x: cx, y: cy } = center();
           const R = Math.min(cx, cy) - 6;
+
           ctx.clearRect(0, 0, elCanvas.width, elCanvas.height);
           ctx.save();
           ctx.translate(cx, cy);
-          ctx.rotate((-90 * Math.PI) / 180);
-
+          ctx.rotate((-90 * Math.PI) / 180); // start at top
           const slice = (Math.PI * 2) / N;
 
           for (let i = 0; i < N; i++) {
@@ -428,6 +513,7 @@
             ctx.strokeStyle = "rgba(0,0,0,.25)";
             ctx.stroke();
 
+            // label
             const name = entrants[i]?.name ?? "";
             const mid = i * slice + slice / 2;
             ctx.save();
@@ -435,31 +521,26 @@
             ctx.textAlign = "right";
             ctx.fillStyle = "#0a0a0a";
             ctx.font = `600 ${Math.max(
-              12,
-              Math.min(20, R * 0.08)
+              11,
+              Math.min(18, R * 0.075)
             )}px ui-sans-serif, system-ui, -apple-system`;
             const maxW = R * 0.78;
             const truncated = truncate(name, ctx, maxW);
-            ctx.fillText(truncated, R - 14, 6); // (no lock emoji, no badge)
+            ctx.fillText(truncated, R - 12, 5);
             ctx.restore();
           }
 
+          // rim
           ctx.beginPath();
           ctx.arc(0, 0, R, 0, Math.PI * 2);
           ctx.lineWidth = 8;
           ctx.strokeStyle = "rgba(255,255,255,.35)";
           ctx.stroke();
+
           ctx.restore();
 
+          // rotation
           elCanvas.style.transform = `rotate(${currentRotation}deg)`;
-        }
-
-        function truncate(text, context, maxWidth) {
-          if (context.measureText(text).width <= maxWidth) return text;
-          let t = text;
-          while (t.length && context.measureText(t + "…").width > maxWidth)
-            t = t.slice(0, -1);
-          return t + "…";
         }
 
         function renderChips() {
@@ -469,7 +550,9 @@
             chip.className = "chip";
             chip.innerHTML = `
         <span>${escapeHtml(e.name)}</span>
-        <span class="x" title="Remove" data-i="${idx}">✕</span>
+        <span class="x" title="Remove" data-i="${idx}" aria-label="Remove ${escapeHtml(
+              e.name
+            )}">✕</span>
       `;
             elChips.appendChild(chip);
           });
@@ -478,6 +561,7 @@
               const i = Number(ev.currentTarget.getAttribute("data-i"));
               entrants.splice(i, 1);
               drawWheel();
+              positionPointer();
               renderChips();
             });
           });
@@ -489,6 +573,7 @@
           entrants.push({ name, excluded: isExcluded(name) });
           renderChips();
           drawWheel();
+          positionPointer();
         }
         function clearAll() {
           entrants = [];
@@ -496,6 +581,7 @@
           pendingWinnerIndex = null;
           renderChips();
           drawWheel();
+          positionPointer();
         }
 
         function pickWinnerIndex() {
@@ -512,11 +598,11 @@
           const N = Math.max(entrants.length, 1);
           const sliceDeg = 360 / N;
           const sliceCenter = (index + 0.5) * sliceDeg;
-          const pointerDeg = 270; // top
+          const pointerDeg = 270; // top (CSS 0deg is right)
           const neededAtEnd = (((pointerDeg - sliceCenter) % 360) + 360) % 360;
           const currentMod = ((currentRotation % 360) + 360) % 360;
           const delta = (((neededAtEnd - currentMod) % 360) + 360) % 360;
-          const spins = 4 + Math.floor(Math.random() * 3);
+          const spins = 4 + Math.floor(Math.random() * 3); // 4-6 spins
           return currentRotation + spins * 360 + delta;
         }
 
@@ -559,6 +645,7 @@
           requestAnimationFrame(step);
         }
 
+        // Modal & confetti
         function showWinnerModal(name) {
           elWinner.textContent = name;
           elModal.classList.add("open");
@@ -570,6 +657,7 @@
             pendingWinnerIndex = null;
             renderChips();
             drawWheel();
+            positionPointer();
           }
           elModal.classList.remove("open");
           clearConfetti();
@@ -584,7 +672,7 @@
             "#118AB2",
             "#ffffff",
           ];
-          const n = 120;
+          const n = 100;
           const durMin = 900,
             durVar = 1000;
           for (let i = 0; i < n; i++) {
@@ -603,6 +691,7 @@
           elConfetti.innerHTML = "";
         }
 
+        // Events
         elAdd.addEventListener("click", () => {
           addName(elInput.value);
           elInput.value = "";
@@ -632,6 +721,9 @@
         elModal.addEventListener("click", (e) => {
           if (e.target === elModal) closeModalAndRemoveWinner();
         });
+        window.addEventListener("orientationchange", () =>
+          setTimeout(setupCanvas, 200)
+        );
 
         function escapeHtml(s) {
           return s.replace(
@@ -647,6 +739,7 @@
           );
         }
 
+        // init
         setupCanvas();
       })();
     </script>
